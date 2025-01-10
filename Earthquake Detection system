@@ -1,0 +1,56 @@
+#include <Wire.h>
+#include <LiquidCrystal.h>
+
+// Initialize the LCD with I2C address 0x27, 16 columns, and 2 rows
+
+
+// Pin definitions
+#define buzzer 9                // Pin connected to the buzzer
+#define vibrationSensorPin 8    // Pin connected to the vibration sensor
+
+// Constants
+#define buzzTime 5000           // Duration for which the buzzer stays on
+
+// Variables
+long start;                     // Stores the start time for the buzzer alert
+int buz = 0;   
+int Contrast = 70;
+const int rs =12,en=11,d4 = 2, d5= 3, d6 =4,d7=   5;
+LiquidCrystal lcd(rs,en,d4,d5,d6,d7);              // Flag to indicate buzzer state (on/off)
+
+void setup() {
+  // Initialize the LCD
+  analogWrite(6,Contrast);           // Turn on the LCD backlight
+
+  // Initialize serial communication
+  Serial.begin(2400);
+  lcd.begin(16,2);
+
+  // Configure pin modes
+  pinMode(buzzer, OUTPUT);
+  pinMode(vibrationSensorPin, INPUT);
+}
+
+void loop() {
+  // Read the vibration sensor
+  int vibrationState = digitalRead(vibrationSensorPin);
+
+  // If vibration is detected
+  if (vibrationState == HIGH && buz == 0) {
+    buz = 1;                    // Set the buzzer flag to on
+    start = millis();           // Store the start time
+    lcd.clear();                // Clear the LCD
+    lcd.setCursor(0, 0);        // Set cursor to the first row
+    lcd.print("Vibration Detected!");
+    digitalWrite(buzzer, HIGH); // Turn on the buzzer
+  }
+
+  // Check if the buzzer has been on for the defined duration
+  if (buz == 1 && (millis() - start) >= buzzTime) {
+    buz = 0;                    // Reset the buzzer flag
+    digitalWrite(buzzer, LOW);  // Turn off the buzzer
+    lcd.clear();                // Clear the LCD
+    lcd.setCursor(0, 0);        // Set cursor to the first row
+    lcd.print("No Vibration");
+  }
+}
