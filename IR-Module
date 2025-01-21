@@ -1,0 +1,32 @@
+int IR=9;
+int LED=12;
+
+
+void setup() {
+  
+
+Serial.begin(11200);
+Serial.println("Serial working");
+
+pinMode(IR,INPUT);
+pinMode(LED,OUTPUT);
+
+
+}
+
+void loop() {
+  
+int previous = digitalRead(IR);
+if(previous==1)
+{
+  digitalWrite(LED,LOW);
+  Serial.println("Motion Detected!");
+
+}
+
+else
+{
+  digitalWrite(LED,HIGH);
+  Serial.println("Motion Ended");
+}
+}
